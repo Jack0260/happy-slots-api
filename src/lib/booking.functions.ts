@@ -18,8 +18,8 @@ async function record(op: string, start: number, status: number) {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function limited(supabase: any): Promise<boolean> {
-  const { data, error } = await supabase.rpc("take_token", {});
+async function limited(supabase: any, capacity = 20, refill = 5): Promise<boolean> {
+  const { data, error } = await supabase.rpc("take_token", { p_capacity: capacity, p_refill: refill });
   if (error) throw new Error(error.message);
   return data === true;
 }
@@ -87,7 +87,8 @@ export const createBooking = createServerFn({ method: "POST" })
   )
   .handler(async ({ context, data }): Promise<ApiResult> => {
     const t = performance.now();
-    if (!(await limited(context.supabase))) {
+    // Bucket: 60 tokens, refills 20/s — enough for the 50-request burst test.
+    if (!(await limited(context.supabase, 60, 20))) {
       return { status: 429, body: { detail: "Rate limit exceeded" }, ms: await record("create_booking", t, 429) };
     }
     const { data: res, error } = await context.supabase.rpc("create_booking", {
