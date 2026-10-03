@@ -1,0 +1,2 @@
+REVOKE EXECUTE ON FUNCTION public.claim_jobs(int), public.complete_job(uuid,boolean,text,int), public.record_latency(text,double precision,int), public.get_metrics() FROM authenticated, anon, PUBLIC;
+GRANT EXECUTE ON FUNCTION public.claim_jobs(int), public.complete_job(uuid,boolean,text,int), public.record_latency(text,double precision,int), public.get_metrics() TO service_role;
