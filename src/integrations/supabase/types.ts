@@ -225,6 +225,12 @@ export type Database = {
         Args: { p_key: string; p_slot_id: string }
         Returns: Json
       }
+      get_booked_slot_ids: {
+        Args: never
+        Returns: {
+          slot_id: string
+        }[]
+      }
       get_metrics: { Args: never; Returns: Json }
       record_latency: {
         Args: { p_ms: number; p_op: string; p_status: number }
