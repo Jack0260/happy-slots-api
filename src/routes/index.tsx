@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Shell } from "@/components/Shell";
 import { AuthPanel } from "@/components/AuthPanel";
 import { useSession } from "@/hooks/use-session";
-import { createBooking, createSlot, listSlots, myBookings } from "@/lib/booking.functions";
+import { createBooking, createSlot, listSlots, myBookings, type ApiResult } from "@/lib/booking.functions";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -73,9 +73,9 @@ function Console() {
       const free = slots.data?.find((s) => !s.booked);
       if (!free) return { detail: "No free slot — create one first." };
       const t = performance.now();
-      const res = await Promise.all(
+      const res: ApiResult[] = await Promise.all(
         Array.from({ length: 50 }, () =>
-          doBook({ data: { slot_id: free.id, idempotency_key: crypto.randomUUID() } }).catch((e) => ({
+          (doBook({ data: { slot_id: free.id, idempotency_key: crypto.randomUUID() } }) as Promise<ApiResult>).catch((e): ApiResult => ({
             status: 500,
             body: String(e),
           })),
@@ -98,9 +98,9 @@ function Console() {
       const free = slots.data?.find((s) => !s.booked);
       if (!free) return { detail: "No free slot — create one first." };
       const k = crypto.randomUUID();
-      const res = await Promise.all(
+      const res = (await Promise.all(
         Array.from({ length: 5 }, () => doBook({ data: { slot_id: free.id, idempotency_key: k } })),
-      );
+      )) as ApiResult[];
       const ids = new Set(res.map((r) => JSON.stringify(r.body)));
       return {
         test: "5 concurrent requests, same idempotency key",

@@ -3,7 +3,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { MAX_ATTEMPTS, sendNotification } from "./notify";
 
-type ApiResult = { status: number; body: unknown; replay?: boolean; ms?: number };
+export type ApiResult = { status: number; body: unknown; replay?: boolean; ms?: number };
 
 async function admin() {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
