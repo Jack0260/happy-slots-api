@@ -45,7 +45,7 @@ function Console() {
 
   const [label, setLabel] = useState("Haircut 10:00");
   const [at, setAt] = useState(() => new Date(Date.now() + 864e5).toISOString().slice(0, 16));
-  const [key, setKey] = useState(() => crypto.randomUUID());
+  const [key, setKey] = useState<string>(() => crypto.randomUUID());
   const [out, setOut] = useState<unknown>(null);
   const [busy, setBusy] = useState(false);
 
