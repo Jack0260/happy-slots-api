@@ -42,10 +42,10 @@ export async function drainQueue(limit = 20) {
     const { data } = await a.rpc("complete_job", {
       p_id: job.id,
       p_ok: ok,
-      p_error: err ?? undefined,
+      ...(err ? { p_error: err } : {}),
       p_max_attempts: MAX_ATTEMPTS,
     });
-    if (typeof data === "string" && data in results) results[data]++;
+    if (typeof data === "string" && data in results) results[data] = (results[data] ?? 0) + 1;
   }
   return { processed: jobs?.length ?? 0, ...results };
 }
