@@ -3,10 +3,10 @@
 import { createClient } from "@supabase/supabase-js";
 import { describe, expect, it } from "vitest";
 
-const url = process.env.VITE_SUPABASE_URL;
-const key = process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
-const email = process.env.TEST_EMAIL;
-const password = process.env.TEST_PASSWORD;
+const url = process.env['VITE_SUPABASE_URL'];
+const key = process.env['VITE_SUPABASE_PUBLISHABLE_KEY'];
+const email = process.env['TEST_EMAIL'];
+const password = process.env['TEST_PASSWORD'];
 const live = Boolean(url && key && email && password);
 
 describe.skipIf(!live)("booking concurrency (live)", () => {

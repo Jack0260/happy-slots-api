@@ -1,9 +1,10 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import type { Json } from "@/integrations/supabase/types";
 import { MAX_ATTEMPTS, sendNotification } from "./notify";
 
-type ApiResult = { status: number; body: unknown; replay?: boolean; ms?: number };
+export type ApiResult = { status: number; body: Json; replay?: boolean; ms?: number };
 
 async function admin() {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -41,10 +42,10 @@ export async function drainQueue(limit = 20) {
     const { data } = await a.rpc("complete_job", {
       p_id: job.id,
       p_ok: ok,
-      p_error: err ?? undefined,
+      ...(err ? { p_error: err } : {}),
       p_max_attempts: MAX_ATTEMPTS,
     });
-    if (typeof data === "string" && data in results) results[data]++;
+    if (typeof data === "string" && data in results) results[data] = (results[data] ?? 0) + 1;
   }
   return { processed: jobs?.length ?? 0, ...results };
 }
@@ -96,7 +97,7 @@ export const createBooking = createServerFn({ method: "POST" })
       p_key: data.idempotency_key,
     });
     if (error) throw new Error(error.message);
-    const r = res as { status: number; body: unknown; replay: boolean };
+    const r = res as { status: number; body: Json; replay: boolean };
     const ms = await record("create_booking", t, r.status);
     // Wake the worker on enqueue (new booking => new notification job).
     if (r.status === 201 && !r.replay) await drainQueue(5);
